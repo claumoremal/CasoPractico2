@@ -1,6 +1,5 @@
 //En este fichero se indicarán las variables que se vayan a utilizar
 
-location = "UK"
 variable "resourceGroupName" {
   default = "rg-casoPracrtico"
 }
