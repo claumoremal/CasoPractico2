@@ -1,7 +1,7 @@
 //En este fichero se indicarán las variables que se vayan a utilizar
 
 variable "resourceGroupName" {
-  default = "rg-casoPracrtico"
+  default = "rg-casoPractico"
 }
 variable "location" {
   default = "uksouth"
