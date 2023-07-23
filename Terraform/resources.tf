@@ -52,6 +52,14 @@ resource "azurerm_network_interface" "vnicPodman" {
   }
 }
 
+//definicion de clave ssh para vmPodman
+resource "azurerm_ssh_public_key" "sshPodman" {
+  name                = "sshPodman"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  public_key          = file("~/.ssh/id_rsa.pub")
+}
+
 //definicion vm Centos8 podman
 resource "azurerm_linux_virtual_machine" "vmPodman" {
   name                = "vmPodman"
