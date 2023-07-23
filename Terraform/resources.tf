@@ -58,7 +58,7 @@ resource "azurerm_linux_virtual_machine" "vmPodman" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   size                = "Standard_DS1_v2"
-  admin_username      = var.ssh_user
+  admin_username      = var.sshUser
   network_interface_ids = [
     azurerm_network_interface.vnicPodman.id,
   ]
