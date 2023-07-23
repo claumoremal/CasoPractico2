@@ -14,6 +14,7 @@ output "acr-username" {
 
 output "acr-password" {
   value = azurerm_container_registry.acr.admin_password
+  sensitive = false
 }
 
 output "acr-loginServer" {

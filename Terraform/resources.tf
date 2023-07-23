@@ -27,8 +27,8 @@ resource "azurerm_subnet" "subnet" {
 }
 
 //definicion de ip publica
-resource "azurerm_public_ip" "publicIP" {
-  name                = "publicIP-casoPractico"
+resource "azurerm_public_ip" "podmanPublicIP" {
+  name                = "podmanPublicIP"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Static"
@@ -39,7 +39,7 @@ resource "azurerm_public_ip" "publicIP" {
 }
 
 //definicion de tarjeta de red virtual para conectar el web server contenerizado
-resource "azurerm_network_interface" "vnic" {
+resource "azurerm_network_interface" "vnicPodman" {
   name                = "vnic-casoPractico"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -48,7 +48,79 @@ resource "azurerm_network_interface" "vnic" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id = azurerm_public_ip.podmanPublicIP.id
   }
+}
+
+//definicion vm Centos8 podman
+resource "azurerm_linux_virtual_machine" "vmPodman" {
+  name                = "vmPodman"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  size                = "Standard_DS1_v2"
+  admin_username      = var.ssh_user
+  network_interface_ids = [
+    azurerm_network_interface.vnicPodman.id,
+  ]
+
+  admin_ssh_key {
+    username   = var.sshUser
+    public_key = file(var.sshPublicKey)
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  plan {
+    name      = "centos-8-stream-free"
+    product   = "centos-8-stream-free"
+    publisher = "cognosys"
+  }
+
+
+  source_image_reference {
+    publisher = "cognosys"
+    offer     = "centos-8-stream-free"
+    sku       = "centos-8-stream-free"
+    version   = "22.03.28"
+  }
+}
+
+//definicion y linkeado de network security group para acceder a vmPodman desde ip publica
+resource "azurerm_network_security_group" "nsgPodman" {
+  name                = "nsgPodman"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  security_rule {
+    name                       = "httpAllow"
+    priority                   = 102
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "8080"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "sshAllow"
+    priority                   = 101
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "nsg-link" {
+  subnet_id                 = azurerm_subnet.subnet.id
+  network_security_group_id = azurerm_network_security_group.nsgPodman.id
 }
 
 //definicion de container registry con elservicio de azure acr

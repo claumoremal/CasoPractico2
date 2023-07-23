@@ -14,3 +14,11 @@ variable "networkName" {
 variable "subnetName" {
   default = "subnet-casoPractico"
 }
+
+variable "sshUser" {
+  default     = "podman"
+}
+
+variable "sshPublicKey" {
+  default     = "~/.ssh/id_rsa.pub"
+}
