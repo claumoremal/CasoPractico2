@@ -73,7 +73,7 @@ resource "azurerm_linux_virtual_machine" "vmPodman" {
 
   admin_ssh_key {
     username   = var.sshUser
-    public_key = azurerm_ssh_public_key.sshPodman.public_key
+    public_key = file(var.sshPublicKey)
   }
 
   os_disk {
