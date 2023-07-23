@@ -52,4 +52,10 @@ resource "azurerm_network_interface" "vnic" {
 }
 
 //definicion de container registry con elservicio de azure acr
-
+resource "azurerm_container_registry" "acr" {
+  name                = "acr-casoPractico"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Basic"
+  admin_enabled       = true
+}
