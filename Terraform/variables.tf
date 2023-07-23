@@ -20,5 +20,5 @@ variable "sshUser" {
 }
 
 variable "sshPublicKey" {
-  default     = "~/.ssh/id_rsa.pub"
+  default     = "~/.ssh/sshCasoPractico.pub"
 }

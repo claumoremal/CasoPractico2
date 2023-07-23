@@ -57,11 +57,11 @@ resource "azurerm_ssh_public_key" "sshPodman" {
   name                = "sshPodman"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  public_key          = file("~/.ssh/id_rsa.pub")
+  public_key          = file("~/.ssh/sshCasoPractico.pub")
 }
 
 //definicion vm Centos8 podman
-/*resource "azurerm_linux_virtual_machine" "vmPodman" {
+resource "azurerm_linux_virtual_machine" "vmPodman" {
   name                = "vmPodman"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
@@ -129,7 +129,7 @@ resource "azurerm_network_security_group" "nsgPodman" {
 resource "azurerm_subnet_network_security_group_association" "nsg-link" {
   subnet_id                 = azurerm_subnet.subnet.id
   network_security_group_id = azurerm_network_security_group.nsgPodman.id
-}*/
+}
 
 //definicion de container registry con elservicio de azure acr
 resource "azurerm_container_registry" "acr" {
