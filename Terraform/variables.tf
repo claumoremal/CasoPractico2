@@ -15,7 +15,7 @@ variable "subnetName" {
   default = "subnet-casoPractico"
 }
 
-variable "sshUser" {
+variable "vmPodmanUser" {
   default     = "podman"
 }
 

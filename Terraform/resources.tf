@@ -62,13 +62,13 @@ resource "azurerm_linux_virtual_machine" "vmPodman" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   size                = "Standard_F2"
-  admin_username      = "podman"
+  admin_username      = var.vmPodmanUser
   network_interface_ids = [
     azurerm_network_interface.vnicPodman.id,
   ]
 
   admin_ssh_key {
-    username   = "podman"
+    username   = var.vmPodmanUser
     public_key = file(var.sshPublicKey)
   }
 
@@ -127,6 +127,23 @@ resource "azurerm_subnet_network_security_group_association" "nsg-link" {
   network_security_group_id = azurerm_network_security_group.nsgPodman.id
 }*/
 
+//definicion de cluster de kubernetes
+resource "azurerm_kubernetes_cluster" "aksCasoPractico" {
+  name                = "aks-casoPractico"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  dns_prefix = aksCasoPractico
+  default_node_pool {
+    name       = "Node"
+    node_count = 1
+    vm_size    = "Standard_D2_v2"
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
 //definicion de container registry con elservicio de azure acr
 resource "azurerm_container_registry" "acr" {
   name                = "acrCasoPractico"
@@ -134,4 +151,12 @@ resource "azurerm_container_registry" "acr" {
   location            = azurerm_resource_group.rg.location
   sku                 = "Basic"
   admin_enabled       = true
+}
+
+//definicion de rol de conexión entre aks y acr
+resource "azurerm_role_assignment" "aks-acr-link" {
+  principal_id                     = azurerm_kubernetes_cluster.aksCasoPractico.kubelet_identity[0].object_id
+  role_definition_name             = "AcrPull"
+  scope                            = azurerm_container_registry.acr.id
+  skip_service_principal_aad_check = true
 }
