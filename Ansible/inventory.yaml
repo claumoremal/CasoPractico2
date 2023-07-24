@@ -1,0 +1,9 @@
+all:
+  hosts:
+  children:
+    webserverPodman:
+      hosts:
+        51.105.31.105:
+    clusterAks:
+      hosts:
+        

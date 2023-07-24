@@ -1,0 +1,67 @@
+#En este playbook se define la configuración e instalacion de los elementos necesarios para exponer un pod con apache en la vmPodman
+---
+- name: "Instalar paquetes necesarios en vmPodman para poder alojar una imagen podman con un webserver de apache"
+  hosts: webserverPodman
+  remote_user: podman 
+  become: true
+  tasks:
+    - name: "Instalar paquetes requeridos para webserver"
+      ansible.builtin.dnf:
+        name:
+          - podman
+          - skopeo
+          - httpd-tools
+          - openssl
+        state: present
+      become_method: sudo
+
+    - name: "Crear directorio para webserver"
+      ansible.builtin.file:
+        path: /home/podman/webserver
+        state: directory
+        mode: '0755'
+  
+    #- name: "posicionarse en directorio webserver"
+    #  shell: cd webserver
+
+    - name: "Creacion de fichero .creds pasra contener usuarios y contraseñas de acceso al portal y creacion de usuario test"
+      community.general.htpasswd:
+        path: /home/podman/webserver/.creds
+        create: true
+        name: test
+        password: "Devops2023"
+
+    - name: "Generar clave privada para el certificado"
+      community.crypto.openssl_privatekey:
+        path: /home/podman/webserver/localhost.key
+        size: 2048
+
+    - name: "Generando solicitud de firma para el certificado"
+      community.crypto.openssl_csr:
+        path: /home/podman/webserver/localhost.csr
+        privatekey_path: /home/podman/webserver/localhost.key
+
+    - name: "Generar cetificado autofirmado"
+      community.crypto.x509_certificate:
+        path: /home/podman/webserver/localhost.crt
+        privatekey_path: /home/podman/webserver/localhost.key
+        csr_path: /home/podman/webserver/localhost.csr
+        provider: selfsigned
+
+    - name: "Copiar plantilla index.html al servidor"
+      template:
+        src: Templates/podmanIndex.html.j2
+        dest: /home/podman/webserver/index.html  
+        mode: "0644"
+
+    - name: "Copiar plantilla de configuracion de apache al servidor"
+      template:
+        src: Templates/podmanhttpd.conf.j2
+        dest: /home/podman/webserver/httpd.conf 
+        mode: "0644"
+
+    - name: "Copiar plantilla de configuracion de htacces al servidor"
+      template:
+        src: Templates/podmanhtaccess.j2
+        dest: /home/podman/webserver/.htaccess
+        mode: "0644"
