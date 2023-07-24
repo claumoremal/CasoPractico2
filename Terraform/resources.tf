@@ -132,7 +132,7 @@ resource "azurerm_kubernetes_cluster" "aksCasoPractico" {
   name                = "aks-casoPractico"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix = aksCasoPractico
+  dns_prefix = "aksCasoPractico"
   default_node_pool {
     name       = "Node"
     node_count = 1
