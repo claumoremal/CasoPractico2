@@ -57,45 +57,8 @@ resource "azurerm_ssh_public_key" "sshPodman" {
 }
 
 //definicion vm Centos8 podman
-/*resource "azurerm_linux_virtual_machine" "vmPodman" {
-  name                = "vmPodman"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  size                = "Standard_DS1_v2"
-  admin_username      = var.sshUser
-  network_interface_ids = [
-    azurerm_network_interface.vnicPodman.id,
-  ]
-
-  admin_ssh_key {
-    username   = var.sshUser
-    public_key = file(var.sshPublicKey)
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
-
-  plan {
-    name      = "centos-8-stream-free"
-    product   = "centos-8-stream-free"
-    publisher = "cognosys"
-  }
-
-
-
-
-  source_image_reference {
-    publisher = "cognosys"
-    offer     = "centos-8-stream-free"
-    sku       = "centos-8-stream-free"
-    version   = "22.03.28"
-  }
-}*/
-
 resource "azurerm_linux_virtual_machine" "vmPodman" {
-  name                = "vm1"
+  name                = "vmCasoPractico"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   size                = "Standard_F2"
