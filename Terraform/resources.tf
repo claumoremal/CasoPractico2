@@ -93,22 +93,11 @@ resource "azurerm_linux_virtual_machine" "vmPodman" {
 }
 
 //definicion y linkeado de network security group para acceder a vmPodman desde ip publica
-/*resource "azurerm_network_security_group" "nsgPodman" {
+resource "azurerm_network_security_group" "nsgPodman" {
   name                = "nsgPodman"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
-  security_rule {
-    name                       = "httpAllow"
-    priority                   = 102
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8080"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
   security_rule {
     name                       = "sshAllow"
     priority                   = 101
@@ -125,7 +114,7 @@ resource "azurerm_linux_virtual_machine" "vmPodman" {
 resource "azurerm_subnet_network_security_group_association" "nsg-link" {
   subnet_id                 = azurerm_subnet.subnet.id
   network_security_group_id = azurerm_network_security_group.nsgPodman.id
-}*/
+}
 
 //definicion de cluster de kubernetes
 resource "azurerm_kubernetes_cluster" "aksCasoPractico" {
