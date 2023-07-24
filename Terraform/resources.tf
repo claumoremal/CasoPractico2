@@ -19,7 +19,7 @@ resource "azurerm_subnet" "subnet" {
   name                 = var.subnetName
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
+  address_prefixes     = ["10.0.2.0/24"]
 }
 
 //definicion de ip publica
@@ -49,15 +49,15 @@ resource "azurerm_network_interface" "vnicPodman" {
 }
 
 //definicion de clave ssh para vmPodman
-resource "azurerm_ssh_public_key" "sshPodman" {
+/*resource "azurerm_ssh_public_key" "sshPodman" {
   name                = "sshPodman"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   public_key          = file("~/.ssh/sshCasoPractico.pub")
-}
+}*/
 
 //definicion vm Centos8 podman
-resource "azurerm_linux_virtual_machine" "vmPodman" {
+/*resource "azurerm_linux_virtual_machine" "vmPodman" {
   name                = "vmPodman"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
@@ -84,6 +84,43 @@ resource "azurerm_linux_virtual_machine" "vmPodman" {
   }
 
 
+
+
+  source_image_reference {
+    publisher = "cognosys"
+    offer     = "centos-8-stream-free"
+    sku       = "centos-8-stream-free"
+    version   = "22.03.28"
+  }
+}*/
+
+resource "azurerm_linux_virtual_machine" "vmPodman" {
+  name                = "vm1"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  size                = "Standard_F2"
+  admin_username      = "podman"
+  network_interface_ids = [
+    azurerm_network_interface.vnicPodman.id,
+  ]
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  plan {
+    name      = "centos-8-stream-free"
+    product   = "centos-8-stream-free"
+    publisher = "cognosys"
+  }
+
+
   source_image_reference {
     publisher = "cognosys"
     offer     = "centos-8-stream-free"
@@ -93,7 +130,7 @@ resource "azurerm_linux_virtual_machine" "vmPodman" {
 }
 
 //definicion y linkeado de network security group para acceder a vmPodman desde ip publica
-resource "azurerm_network_security_group" "nsgPodman" {
+/*resource "azurerm_network_security_group" "nsgPodman" {
   name                = "nsgPodman"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -125,7 +162,7 @@ resource "azurerm_network_security_group" "nsgPodman" {
 resource "azurerm_subnet_network_security_group_association" "nsg-link" {
   subnet_id                 = azurerm_subnet.subnet.id
   network_security_group_id = azurerm_network_security_group.nsgPodman.id
-}
+}*/
 
 //definicion de container registry con elservicio de azure acr
 resource "azurerm_container_registry" "acr" {
